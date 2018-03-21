@@ -2,7 +2,7 @@
  * Copyright 2015 Drifty Co.
  * http://drifty.com/
  *
- * Ionic, v1.3.3
+ * Ionic, v1.3.4
  * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
@@ -5122,8 +5122,8 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
   }
 
   function compareStatePrefixes(enteringStateName, exitingStateName) {
-    var enteringStateSuffixIndex = enteringStateName.lastIndexOf('.');
-    var exitingStateSuffixIndex = exitingStateName.lastIndexOf('.');
+    var enteringStateSuffixIndex = enteringStateName.indexOf('.');
+    var exitingStateSuffixIndex = exitingStateName.indexOf('.');
 
     // if either of the prefixes are empty, just return false
     if ( enteringStateSuffixIndex < 0 || exitingStateSuffixIndex < 0 ) {
@@ -13860,18 +13860,6 @@ function($compile, $ionicConfig, $ionicBind, $ionicViewSwitcher) {
             // remove the hide class so the tabs content shows up
             $ionicViewSwitcher.viewEleIsActive(childElement, true);
 
-          } else if (isTabContentAttached && childElement) {
-            // this tab should NOT be selected, and it is already in the DOM
-
-            if ($ionicConfig.views.maxCache() > 0) {
-              // keep the tabs in the DOM, only css hide it
-              $ionicViewSwitcher.viewEleIsActive(childElement, false);
-
-            } else {
-              // do not keep tabs in the DOM
-              destroyTab();
-            }
-
           }
         }
 
@@ -13888,6 +13876,22 @@ function($compile, $ionicConfig, $ionicBind, $ionicViewSwitcher) {
           $ionicViewSwitcher.viewEleIsActive(childElement, $scope.$tabSelected);
         });
 
+        $scope.$on('$ionicView.afterLeave', function(leavingData) {
+          if (($scope.$tabSelected == true) && (leavingData.currentScope.navViewName == tabCtrl.navViewName)) {
+            // not leaving the tab, nothing to do
+            return;
+          }
+
+          if ($ionicConfig.views.maxCache() > 0) {
+            // keep the tabs in the DOM, only css hide it
+            $ionicViewSwitcher.viewEleIsActive(childElement, false);
+
+          } else {
+            // do not keep tabs in the DOM
+            destroyTab();
+          }
+        });
+
         $scope.$on('$ionicView.clearCache', function() {
           if (!$scope.$tabSelected) {
             destroyTab();
@@ -13898,7 +13902,6 @@ function($compile, $ionicConfig, $ionicBind, $ionicViewSwitcher) {
     }
   };
 }]);
-
 IonicModule
 .directive('ionTabNav', [function() {
   return {
