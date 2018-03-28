@@ -4847,14 +4847,15 @@ function($timeout, $document, $q, $ionicClickBlock, $ionicConfig, $ionicNavBarDe
             // resolve that this one transition (there could be many w/ nested views)
             deferred && deferred.resolve(navViewCtrl);
 
+            // emit that the views have finished transitioning
+            // each parent nav-view will update which views are active and cached
+            switcher.emit('after', enteringData, leavingData);
+
             // the most recent transition added has completed and all the active
             // transition promises should be added to the services array of promises
             if (transitionId === transitionCounter) {
               $q.all(transitionPromises).then(ionicViewSwitcher.transitionEnd);
 
-              // emit that the views have finished transitioning
-              // each parent nav-view will update which views are active and cached
-              switcher.emit('after', enteringData, leavingData);
               switcher.cleanup(enteringData);
             }
 
