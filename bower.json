@@ -11,10 +11,6 @@
   "description": "Advanced HTML5 hybrid mobile app development framework.",
   "main": [
     "release/css/ionic.css",
-    "release/fonts/ionicons.eot",
-    "release/fonts/ionicons.svg",
-    "release/fonts/ionicons.ttf",
-    "release/fonts/ionicons.woff",
     "release/js/ionic-angular.js"
   ],
   "keywords": [
