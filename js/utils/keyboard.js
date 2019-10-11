@@ -652,13 +652,17 @@ function keyboardGetHeight() {
   // fallback for when it's the webview without the plugin
   // or for just the standard web browser
   // TODO: have these be based on device
-  if (ionic.Platform.isIOS()) {
+  if (ionic.Platform.isIOS() || ionic.Platform.isIOSInsets()) {
     if (ionic.keyboard.isLandscape) {
       return 206;
     }
 
-    if (!ionic.Platform.isWebView()) {
+    if (!ionic.Platform.isWebView() && ionic.Platform.isIOS()) {
       return 216;
+    }
+
+    if (!ionic.Platform.isWebView() && ionic.Platform.isIOSInsets()) {
+      return 216 + 34; // Bottom inset height
     }
 
     return 260;

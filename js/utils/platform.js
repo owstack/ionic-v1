@@ -8,6 +8,7 @@
   }
 
   var IOS = 'ios';
+  var IOS_INSETS = 'iphoneinsets';
   var ANDROID = 'android';
   var WINDOWS_PHONE = 'windowsphone';
   var EDGE = 'edge';
@@ -222,6 +223,14 @@
     },
     /**
      * @ngdoc method
+     * @name ionic.Platform#isIOSInsets
+     * @returns {boolean} Whether we are running on an iOS device with insets.
+     */
+    isIOSInsets: function() {
+      return self.is(IOS_INSETS);
+    },
+    /**
+     * @ngdoc method
      * @name ionic.Platform#isAndroid
      * @returns {boolean} Whether we are running on Android.
      */
@@ -274,6 +283,8 @@
         platformName = WINDOWS_PHONE;
       } else if (self.ua.indexOf('Android') > 0) {
         platformName = ANDROID;
+      } else if (/iPhone10/.test(self.ua)) {
+        platformName = IOS_INSETS;
       } else if (/iPhone|iPad|iPod/.test(self.ua)) {
         platformName = IOS;
       } else {
