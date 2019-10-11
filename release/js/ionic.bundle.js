@@ -2045,6 +2045,7 @@ window.ionic.version = '1.3.4';
   }
 
   var IOS = 'ios';
+  var IOS_INSETS = 'iphoneinsets';
   var ANDROID = 'android';
   var WINDOWS_PHONE = 'windowsphone';
   var EDGE = 'edge';
@@ -2259,6 +2260,14 @@ window.ionic.version = '1.3.4';
     },
     /**
      * @ngdoc method
+     * @name ionic.Platform#isIOSInsets
+     * @returns {boolean} Whether we are running on an iOS device with insets.
+     */
+    isIOSInsets: function() {
+      return self.is(IOS_INSETS);
+    },
+    /**
+     * @ngdoc method
      * @name ionic.Platform#isAndroid
      * @returns {boolean} Whether we are running on Android.
      */
@@ -2311,6 +2320,8 @@ window.ionic.version = '1.3.4';
         platformName = WINDOWS_PHONE;
       } else if (self.ua.indexOf('Android') > 0) {
         platformName = ANDROID;
+      } else if (/iPhone10/.test(self.ua)) {
+        platformName = IOS_INSETS;
       } else if (/iPhone|iPad|iPod/.test(self.ua)) {
         platformName = IOS;
       } else {
@@ -4216,13 +4227,17 @@ function keyboardGetHeight() {
   // fallback for when it's the webview without the plugin
   // or for just the standard web browser
   // TODO: have these be based on device
-  if (ionic.Platform.isIOS()) {
+  if (ionic.Platform.isIOS() || ionic.Platform.isIOSInsets()) {
     if (ionic.keyboard.isLandscape) {
       return 206;
     }
 
-    if (!ionic.Platform.isWebView()) {
+    if (!ionic.Platform.isWebView() && ionic.Platform.isIOS()) {
       return 216;
+    }
+
+    if (!ionic.Platform.isWebView() && ionic.Platform.isIOSInsets()) {
+      return 216 + 34; // Bottom inset height
     }
 
     return 260;
