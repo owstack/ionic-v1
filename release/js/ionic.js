@@ -2038,12 +2038,27 @@ window.ionic.version = '1.3.4';
   }
 
   var IOS = 'ios';
-  var IOS_INSETS = 'iosinsets';
   var ANDROID = 'android';
   var WINDOWS_PHONE = 'windowsphone';
   var EDGE = 'edge';
   var CROSSWALK = 'crosswalk';
   var requestAnimationFrame = ionic.requestAnimationFrame;
+
+  // Get the device pixel ratio
+  var ratio = window.devicePixelRatio || 1;
+
+  // Define the users device screen dimensions
+  var screen = {
+    width : window.screen.width * ratio,
+    height : window.screen.height * ratio
+  };
+
+  // iPhone devices with insets
+  var iosDeviceWithInsets = {
+    //        X,XS  Xr,11  XSMax,11Pro
+    width:  [1125,   828,        1242],
+    height: [2436,  1792,        2688]
+  };
 
   /**
    * @ngdoc utility
@@ -2067,6 +2082,7 @@ window.ionic.version = '1.3.4';
    *   var isWebView = ionic.Platform.isWebView();
    *   var isIPad = ionic.Platform.isIPad();
    *   var isIOS = ionic.Platform.isIOS();
+   *   var isIOSWithInsets = ionic.Platform.isIOSWithInsets();
    *   var isAndroid = ionic.Platform.isAndroid();
    *   var isWindowsPhone = ionic.Platform.isWindowsPhone();
    *
@@ -2253,11 +2269,11 @@ window.ionic.version = '1.3.4';
     },
     /**
      * @ngdoc method
-     * @name ionic.Platform#isIOSInsets
+     * @name ionic.Platform#isIOSWithInsets
      * @returns {boolean} Whether we are running on an iOS device with insets.
      */
-    isIOSInsets: function() {
-      return self.is(IOS_INSETS);
+    isIOSWithInsets: function() {
+      return (iosDeviceWithInsets.width.includes(screen.width) && iosDeviceWithInsets.height.includes(screen.height));
     },
     /**
      * @ngdoc method
@@ -2302,22 +2318,7 @@ window.ionic.version = '1.3.4';
     /**
      * @private
      */
-    setPlatform: function(n) {
-
-      // Get the device pixel ratio
-      var ratio = window.devicePixelRatio || 1;
-    
-      // Define the users device screen dimensions
-      var screen = {
-        width : window.screen.width * ratio,
-        height : window.screen.height * ratio
-      };
-    
-      // iPhone with insets detection
-      //             X,XS  Xr,11  XSMax,11Pro
-      var widths  = [1125,   828,        1242];
-      var heights = [2436,  1792,        2688];
-
+    setPlatform: function(n) {    
       if (typeof n != 'undefined' && n !== null && n.length) {
         platformName = n.toLowerCase();
       } else if (getParameterByName('ionicplatform')) {
@@ -2330,9 +2331,6 @@ window.ionic.version = '1.3.4';
         platformName = ANDROID;
       } else if (/iPhone|iPad|iPod/.test(self.ua)) {
         platformName = IOS;
-        if (widths.includes(screen.width) && heights.includes(screen.height)) {
-          platformName = IOS_INSETS;
-        }
       } else {
         platformName = self.navigator.platform && navigator.platform.toLowerCase().split(' ')[0] || '';
       }
@@ -4236,20 +4234,24 @@ function keyboardGetHeight() {
   // fallback for when it's the webview without the plugin
   // or for just the standard web browser
   // TODO: have these be based on device
-  if (ionic.Platform.isIOS() || ionic.Platform.isIOSInsets()) {
+  if (ionic.Platform.isIOS()) {
     if (ionic.keyboard.isLandscape) {
       return 206;
     }
 
-    if (!ionic.Platform.isWebView() && ionic.Platform.isIOS()) {
-      return 216;
+    if (!ionic.Platform.isWebView()) {
+      if (!ionic.Platform.isIOSWithInsets()) {
+        return 216;
+      } else {
+        return 216 + 34; // Bottom inset height
+      }
+    } else {
+      if (!ionic.Platform.isIOSWithInsets()) {
+        return 260;
+      } else {
+        return 260 + 34; // Bottom inset height
+      }
     }
-
-    if (!ionic.Platform.isWebView() && ionic.Platform.isIOSInsets()) {
-      return 216 + 34; // Bottom inset height
-    }
-
-    return 260;
   }
 
   // safe guess
