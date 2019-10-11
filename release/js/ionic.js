@@ -2038,7 +2038,7 @@ window.ionic.version = '1.3.4';
   }
 
   var IOS = 'ios';
-  var IOS_INSETS = 'iphoneinsets';
+  var IOS_INSETS = 'iosinsets';
   var ANDROID = 'android';
   var WINDOWS_PHONE = 'windowsphone';
   var EDGE = 'edge';
@@ -2303,6 +2303,21 @@ window.ionic.version = '1.3.4';
      * @private
      */
     setPlatform: function(n) {
+
+      // Get the device pixel ratio
+      var ratio = window.devicePixelRatio || 1;
+    
+      // Define the users device screen dimensions
+      var screen = {
+        width : window.screen.width * ratio,
+        height : window.screen.height * ratio
+      };
+    
+      // iPhone with insets detection
+      //             X,XS  Xr,11  XSMax,11Pro
+      var widths  = [1125,   828,        1242];
+      var heights = [2436,  1792,        2688];
+
       if (typeof n != 'undefined' && n !== null && n.length) {
         platformName = n.toLowerCase();
       } else if (getParameterByName('ionicplatform')) {
@@ -2313,10 +2328,11 @@ window.ionic.version = '1.3.4';
         platformName = WINDOWS_PHONE;
       } else if (self.ua.indexOf('Android') > 0) {
         platformName = ANDROID;
-      } else if (/iPhone10/.test(self.ua)) {
-        platformName = IOS_INSETS;
       } else if (/iPhone|iPad|iPod/.test(self.ua)) {
         platformName = IOS;
+        if (widths.includes(screen.width) && heights.includes(screen.height)) {
+          platformName = IOS_INSETS;
+        }
       } else {
         platformName = self.navigator.platform && navigator.platform.toLowerCase().split(' ')[0] || '';
       }
